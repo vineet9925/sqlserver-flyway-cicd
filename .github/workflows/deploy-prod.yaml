@@ -7,7 +7,7 @@ on:
 
 jobs:
   flyway-migration:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
 
@@ -23,8 +23,10 @@ jobs:
     # =========================
     - name: Flyway Validate
       id: validate
-      uses: flyway/flyway-github-action@v10
+      uses: red-gate/setup-flyway@v3
       with:
+        edition: community
+        i-agree-to-the-eula: true
         operation: validate
         url: ${{ secrets.SQL_SERVER_URL }}
         user: ${{ secrets.SQL_SERVER_USER }}
