@@ -51,8 +51,10 @@ jobs:
     - name: Flyway Migrate
       id: migrate
       if: success()
-      uses: flyway/flyway-github-action@v10
+      uses: red-gate/setup-flyway@v3
       with:
+        edition: community
+        i-agree-to-the-eula: true
         operation: migrate
         configFiles: ./database/flyway.conf
         url: ${{ secrets.SQL_SERVER_URL }}
