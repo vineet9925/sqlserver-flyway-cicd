@@ -1,48 +1,39 @@
-name: Flyway DB Migration Pipeline
+name: Production Flyway Database Deployment
 
 on:
   workflow_dispatch:
 
 jobs:
-  flyway-migration:
+  deploy-database:
+    name: Validate and Migrate SQL Server
     runs-on: self-hosted
+    environment: production
+
+    # =========================================================================
+    # 1. THIS IS WHERE THE UPDATE GOES (Right here under the job setup)
+    # =========================================================================
+    env:
+      FLYWAY_URL: "jdbc:sqlserver://awsdatapoc4:1433;databaseName=test;encrypt=true;trustServerCertificate=true;"
+      FLYWAY_USER: ${{ secrets.SQL_SERVER_USER }}
+      FLYWAY_PASSWORD: ${{ secrets.SQL_SERVER_PASSWORD }}
+      FLYWAY_CONFIG_FILES: ./database/flyway.conf
 
     steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
 
-    # =========================
-    # 1. Checkout code
-    # =========================
-    - name: Checkout Repository
-      uses: actions/checkout@v4
-
-
-    # Step 2: Install Flyway ONCE (No database credentials go here)
-    - name: Set up Official Flyway CLI
-      uses: red-gate/setup-flyway@v3
-      with:
+      - name: Set up Official Flyway CLI
+        uses: red-gate/setup-flyway@v3
+        with:
           edition: community
           i-agree-to-the-eula: true
-        
-    - name: Flyway Schema Validation
-      run: flyway validate "-configFiles=./flyway.conf" "-url=${{ secrets.SQL_SERVER_URL }}" "-user=${{ secrets.SQL_SERVER_USER }}" "-password=${{ secrets.SQL_SERVER_PASSWORD }}"
 
-      # Step 4: Run the Migrate Command using standard command line
-    - name: Execute Pending Migrations
-      run: flyway migrate "-configFiles=./flyway.conf" "-url=${{ secrets.SQL_SERVER_URL }}" "-user=${{ secrets.SQL_SERVER_USER }}" "-password=${{ secrets.SQL_SERVER_PASSWORD }}"
+      # =========================================================================
+      # 2. NOTICE HOW CLEAN THESE STEPS ARE NOW. 
+      # You completely delete the old "-configFiles...", "-url..." text.
+      # =========================================================================
+      - name: Flyway Schema Validation
+        run: flyway validate
 
-  
-
-    - name: Stop if validate failed
-      if: failure() && steps.validate.outcome == 'failure'
-      run: exit 1
-
-
-
-
-    - name: Stop if migration failed
-      if: failure() && steps.migrate.outcome == 'failure'
-      run: exit 1
-
-
-     
-
+      - name: Execute Pending Migrations
+        run: flyway migrate
