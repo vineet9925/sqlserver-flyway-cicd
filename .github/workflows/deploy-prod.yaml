@@ -24,11 +24,11 @@ jobs:
           i-agree-to-the-eula: true
         
     - name: Flyway Schema Validation
-      run: flyway validate "-configFiles=./database/flyway.conf" "-url=${{ secrets.DB_URL }}" "-user=${{ secrets.DB_USER }}" "-password=${{ secrets.DB_PASSWORD }}"
+      run: flyway validate "-configFiles=./flyway.conf" "-url=${{ secrets.DB_URL }}" "-user=${{ secrets.DB_USER }}" "-password=${{ secrets.DB_PASSWORD }}"
 
       # Step 4: Run the Migrate Command using standard command line
     - name: Execute Pending Migrations
-      run: flyway migrate "-configFiles=./database/flyway.conf" "-url=${{ secrets.DB_URL }}" "-user=${{ secrets.DB_USER }}" "-password=${{ secrets.DB_PASSWORD }}"
+      run: flyway migrate "-configFiles=./flyway.conf" "-url=${{ secrets.DB_URL }}" "-user=${{ secrets.DB_USER }}" "-password=${{ secrets.DB_PASSWORD }}"
 
   
 
