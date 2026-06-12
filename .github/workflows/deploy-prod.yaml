@@ -32,13 +32,7 @@ jobs:
         user: ${{ secrets.SQL_SERVER_USER }}
         password: ${{ secrets.SQL_SERVER_PASSWORD }}
 
-    # Notify + stop if validate fails
-    - name: Notify Validate Failure (Teams)
-      if: failure() && steps.validate.outcome == 'failure'
-      run: |
-        curl -H "Content-Type: application/json" \
-        -d '{"text":"❌ Flyway VALIDATION FAILED. Migration stopped. Check SQL scripts."}' \
-        ${{ secrets.TEAMS_WEBHOOK }}
+  
 
     - name: Stop if validate failed
       if: failure() && steps.validate.outcome == 'failure'
@@ -56,18 +50,10 @@ jobs:
         edition: community
         i-agree-to-the-eula: true
         operation: migrate
-        configFiles: ./database/flyway.conf
         url: ${{ secrets.SQL_SERVER_URL }}
         user: ${{ secrets.SQL_SERVER_USER }}
         password: ${{ secrets.SQL_SERVER_PASSWORD }}
 
-    # Notify + stop if migrate fails
-    - name: Notify Migration Failure (Teams)
-      if: failure() && steps.migrate.outcome == 'failure'
-      run: |
-        curl -H "Content-Type: application/json" \
-        -d '{"text":"❌ DATABASE MIGRATION FAILED in production. Check Flyway logs immediately."}' \
-        ${{ secrets.TEAMS_WEBHOOK }}
 
     - name: Stop if migration failed
       if: failure() && steps.migrate.outcome == 'failure'
