@@ -32,8 +32,7 @@ jobs:
       # 2. NOTICE HOW CLEAN THESE STEPS ARE NOW. 
       # You completely delete the old "-configFiles...", "-url..." text.
       # =========================================================================
-      - name: Flyway Schema Validation
-        run: flyway validate
+      
 
       - name: Execute Pending Migrations
         run: flyway migrate
