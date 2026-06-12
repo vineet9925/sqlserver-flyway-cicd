@@ -1,3 +1,4 @@
+USE test;
 CREATE TABLE dbo.Customer
 (
     CustomerID INT IDENTITY(1,1),
