@@ -1,8 +1,6 @@
 name: Flyway DB Migration Pipeline
 
 on:
-  push:
-    branches: [ "main" ]
   workflow_dispatch:
 
 jobs:
@@ -18,19 +16,19 @@ jobs:
       uses: actions/checkout@v4
 
 
-    # =========================
-    # 2. Flyway Validate
-    # =========================
-    - name: Flyway Validate
-      id: validate
+    # Step 2: Install Flyway ONCE (No database credentials go here)
+    - name: Set up Official Flyway CLI
       uses: red-gate/setup-flyway@v3
       with:
-        edition: community
-        i-agree-to-the-eula: true
-        operation: validate
-        url: ${{ secrets.SQL_SERVER_URL }}
-        user: ${{ secrets.SQL_SERVER_USER }}
-        password: ${{ secrets.SQL_SERVER_PASSWORD }}
+          edition: community
+          i-agree-to-the-eula: true
+        
+    - name: Flyway Schema Validation
+      run: flyway validate "-configFiles=./database/flyway.conf" "-url=${{ secrets.DB_URL }}" "-user=${{ secrets.DB_USER }}" "-password=${{ secrets.DB_PASSWORD }}"
+
+      # Step 4: Run the Migrate Command using standard command line
+    - name: Execute Pending Migrations
+      run: flyway migrate "-configFiles=./database/flyway.conf" "-url=${{ secrets.DB_URL }}" "-user=${{ secrets.DB_USER }}" "-password=${{ secrets.DB_PASSWORD }}"
 
   
 
