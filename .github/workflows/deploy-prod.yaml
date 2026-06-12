@@ -37,20 +37,6 @@ jobs:
       run: exit 1
 
 
-    # =========================
-    # 3. Flyway Migrate (Deploy)
-    # =========================
-    - name: Flyway Migrate
-      id: migrate
-      if: success()
-      uses: red-gate/setup-flyway@v3
-      with:
-        edition: community
-        i-agree-to-the-eula: true
-        operation: migrate
-        url: ${{ secrets.SQL_SERVER_URL }}
-        user: ${{ secrets.SQL_SERVER_USER }}
-        password: ${{ secrets.SQL_SERVER_PASSWORD }}
 
 
     - name: Stop if migration failed
