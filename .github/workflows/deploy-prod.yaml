@@ -16,7 +16,7 @@ jobs:
       FLYWAY_URL: "jdbc:sqlserver://awsdatapoc4:1433;databaseName=test;encrypt=true;trustServerCertificate=true;"
       FLYWAY_USER: ${{ secrets.SQL_SERVER_USER }}
       FLYWAY_PASSWORD: ${{ secrets.SQL_SERVER_PASSWORD }}
-      FLYWAY_CONFIG_FILES: ./database/flyway.conf
+      FLYWAY_CONFIG_FILES: ./flyway.conf
 
     steps:
       - name: Checkout Source Code
