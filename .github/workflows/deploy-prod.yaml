@@ -1,0 +1,74 @@
+name: Flyway DB Migration Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  flyway-migration:
+    runs-on: ubuntu-latest
+
+    steps:
+
+    # =========================
+    # 1. Checkout code
+    # =========================
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+
+    # =========================
+    # 2. Flyway Validate
+    # =========================
+    - name: Flyway Validate
+      id: validate
+      uses: flyway/flyway-github-action@v10
+      with:
+        operation: validate
+        url: ${{ secrets.SQL_SERVER_URL }}
+        user: ${{ secrets.SQL_SERVER_USER }}
+        password: ${{ secrets.SQL_SERVER_PASSWORD }}
+
+    # Notify + stop if validate fails
+    - name: Notify Validate Failure (Teams)
+      if: failure() && steps.validate.outcome == 'failure'
+      run: |
+        curl -H "Content-Type: application/json" \
+        -d '{"text":"❌ Flyway VALIDATION FAILED. Migration stopped. Check SQL scripts."}' \
+        ${{ secrets.TEAMS_WEBHOOK }}
+
+    - name: Stop if validate failed
+      if: failure() && steps.validate.outcome == 'failure'
+      run: exit 1
+
+
+    # =========================
+    # 3. Flyway Migrate (Deploy)
+    # =========================
+    - name: Flyway Migrate
+      id: migrate
+      if: success()
+      uses: flyway/flyway-github-action@v10
+      with:
+        operation: migrate
+        configFiles: ./database/flyway.conf
+        url: ${{ secrets.SQL_SERVER_URL }}
+        user: ${{ secrets.SQL_SERVER_USER }}
+        password: ${{ secrets.SQL_SERVER_PASSWORD }}
+
+    # Notify + stop if migrate fails
+    - name: Notify Migration Failure (Teams)
+      if: failure() && steps.migrate.outcome == 'failure'
+      run: |
+        curl -H "Content-Type: application/json" \
+        -d '{"text":"❌ DATABASE MIGRATION FAILED in production. Check Flyway logs immediately."}' \
+        ${{ secrets.TEAMS_WEBHOOK }}
+
+    - name: Stop if migration failed
+      if: failure() && steps.migrate.outcome == 'failure'
+      run: exit 1
+
+
+     
+
