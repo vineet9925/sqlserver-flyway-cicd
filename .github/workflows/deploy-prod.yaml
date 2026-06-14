@@ -48,7 +48,7 @@ jobs:
            username: ${{ secrets.GMAIL_USER }}
            password: ${{ secrets.GMAIL_PASSWORD }}
            subject: "🚀 SUCCESS: Production Database DDL Pipeline Completed"
-           to: "your-team-email@company.com, another-person@company.com" # Recipients
+           to: "nairvineet1991@gmail.com" # Recipients
            from: "GitHub DevOps Automation <${{ secrets.GMAIL_USER }}>"
            secure: true
            priority: normal
