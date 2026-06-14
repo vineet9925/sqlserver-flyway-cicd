@@ -7,7 +7,7 @@ jobs:
   deploy-database:
     name: Validate and Migrate SQL Server
     runs-on: self-hosted
-    environment: production
+    environment: test
 
     # =========================================================================
     # 1. THIS IS WHERE THE UPDATE GOES (Right here under the job setup)
