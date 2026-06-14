@@ -36,3 +36,28 @@ jobs:
 
       - name: Execute Pending Migrations
         run: flyway migrate
+
+
+      # Step 6: Send Success Email via GMAIL
+      - name: Send Success Email via Gmail
+        if: success()
+        uses: dawidd6/action-send-mail@v3
+        with:
+           server_address: smtp.gmail.com # Changed from Outlook to Google's SMTP Server
+           server_port: 465               # Port 465 is the standard secure port for Gmail
+           username: ${{ secrets.GMAIL_USER }}
+           password: ${{ secrets.GMAIL_PASSWORD }}
+           subject: "🚀 SUCCESS: Production Database DDL Pipeline Completed"
+           to: "your-team-email@company.com, another-person@company.com" # Recipients
+           from: "GitHub DevOps Automation <${{ secrets.GMAIL_USER }}>"
+           secure: true
+           priority: normal
+           html_body: |
+            <h2>Database Deployment Successful</h2>
+            <p>The automated midnight pipeline has successfully deployed all pending SQL Server DDL scripts.</p>
+            <ul>
+             <li><b>Repository:</b> ${{ github.repository }}</li>
+             <li><b>Status:</b> All Flyway migrations applied successfully via Gmail integration</li>
+             <li><b>Execution Time:</b> 12:00 AM EST</li>
+             </ul>
+             <p>You can view the detailed execution logs <a href="https://github.com/${{ github.repository }}/actions">here</a>.</p>
