@@ -41,7 +41,7 @@ jobs:
          # ==========================================
 
       - name: Send Email - Success
-        if: success() && env.STATUS == 'SUCCESS'
+        if: success()
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
@@ -57,7 +57,7 @@ jobs:
             Please check the GitHub logs for details.
 
       - name: Send Email - Already Executed
-        if: success() && env.STATUS == 'ALREADY_EXECUTED'
+        if: success()
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
@@ -73,7 +73,7 @@ jobs:
             Database is up-to-date. No new modifications were applied.
 
       - name: Send Email - Failed
-        if: always() && env.STATUS == 'FAILED' # Runs even if previous steps failed
+        if: always() # Runs even if previous steps failed
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
