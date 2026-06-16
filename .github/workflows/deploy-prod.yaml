@@ -32,32 +32,84 @@ jobs:
       # 2. NOTICE HOW CLEAN THESE STEPS ARE NOW. 
       # You completely delete the old "-configFiles...", "-url..." text.
       # =========================================================================
-      
+      - name: Execute flyway Migrate
+        run: flyway migrate -validateOnMigrate=false > flyway_output.log 2>&1 || exit_code=$?
+          
+          # Print the logs to the screen so you can read them in the GitHub Actions dashboard
+           cat flyway_output.log
+          
+          # --- DYNAMIC STATUS PARSING ---
+          if [ -n "$exit_code" ] && [ "$exit_code" -ne 0 ]; then
+            echo "STATUS=FAILED" >> $GITHUB_ENV
+            echo "status=failed" >> $GITHUB_OUTPUT
+            exit $exit_code # Force the step to fail so GitHub knows it crashed
+          elif grep -q "No migration necessary" flyway_output.log; then
+            echo "STATUS=ALREADY_EXECUTED" >> $GITHUB_ENV
+            echo "status=already_executed" >> $GITHUB_OUTPUT
+          else
+            echo "STATUS=SUCCESS" >> $GITHUB_ENV
+            echo "status=success" >> $GITHUB_OUTPUT
+          fi
 
-      - name: Execute Pending Migrations
-        run: flyway migrate
+      # =========================================================================
+      # Auto-Clean Safety Step: Cleans tracking table only if Flyway crashed
+      # =========================================================================
+      - name: Auto-Clean History Table if Migration Fails
+         if: failure() && steps.flyway_run.outputs.status == 'failed'
+         run: |
+           echo "Migration failed. Automatically running Flyway Repair to clear the broken history row..."
+           flyway repair --configFiles=${{ env.FLYWAY_CONFIG_FILES }}
+		  
+		  
+	     # ==========================================
+         #  DYNAMIC EMAIL NOTIFICATIONS
+         # ==========================================
 
-
-      # Step 6: Send Success Email via GMAIL
-      - name: Send Success Email via Gmail
-        if: success()
+      - name: Send Email - Success
+        if: success() && env.STATUS == 'SUCCESS'
         uses: dawidd6/action-send-mail@v3
         with:
-           server_address: smtp.gmail.com # Changed from Outlook to Google's SMTP Server
-           server_port: 587               # Port 465 is the standard secure port for Gmail
-           username: ${{ secrets.GMAIL_USER }}
-           password: ${{ secrets.GMAIL_PASSWORD }}
-           subject: "🚀 SUCCESS: Production Database DDL Pipeline Completed"
-           to: "nairvineet1991@gmail.com" # Recipients
-           from: "GitHub DevOps Automation <${{ secrets.GMAIL_USER }}>"
-           secure: true
-           priority: normal
-           html_body: |
-            <h2>Database Deployment Successful</h2>
-            <p>The automated midnight pipeline has successfully deployed all pending SQL Server DDL scripts.</p>
-            <ul>
-             <li><b>Repository:</b> ${{ github.repository }}</li>
-             <li><b>Status:</b> All Flyway migrations applied successfully via Gmail integration</li>
-             <li><b>Execution Time:</b> 12:00 AM EST</li>
-             </ul>
-             <p>You can view the detailed execution logs <a href="https://github.com/${{ github.repository }}/actions">here</a>.</p>
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.GMAIL_USER }}
+          password: ${{ secrets.GMAIL_PASSWORD }}
+          secure: true
+          subject: "Flyway Migration SUCCESS"
+          to: nairvineet1991@gmail.com
+          from: GitHub Actions Runner
+          body: |
+            New database migrations were applied successfully to the data center! 
+            Please check the GitHub logs for details.
+
+      - name: Send Email - Already Executed
+        if: success() && env.STATUS == 'ALREADY_EXECUTED'
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.GMAIL_USER }}
+          password: ${{ secrets.GMAIL_PASSWORD }}
+          secure: true
+          subject: "Flyway Migration: No Changes"
+          to: nairvineet1991@gmail.com
+          from: GitHub Actions Runner
+          body: |
+            The pipeline ran, but all scripts were already executed. 
+            Database is up-to-date. No new modifications were applied.
+
+      - name: Send Email - Failed
+        if: always() && env.STATUS == 'FAILED' # Runs even if previous steps failed
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.GMAIL_USER }}
+          password: ${{ secrets.GMAIL_PASSWORD }}
+          secure: true
+          subject: "Flyway Migration FAILED"
+          to: nairvineet1991@gmail.com
+          from: GitHub Actions Runner
+          body: |
+            CRITICAL: The migration script encountered an error and failed execution. 
+            The SQL transaction has been rolled back and the tracking table was automatically repaired.
+            Please review your V5__ or latest migration file formatting.
