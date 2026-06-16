@@ -76,8 +76,8 @@ jobs:
           password: ${{ secrets.GMAIL_PASSWORD }}
           secure: true
           subject: "Flyway Migration SUCCESS"
-          to: nairvineet1991@gmail.com
-          from: GitHub Actions Runner
+          to: "nairvineet1991@gmail.com" # Recipients
+          from: "GitHub DevOps Automation <${{ secrets.GMAIL_USER }}>"
           body: |
             New database migrations were applied successfully to the data center! 
             Please check the GitHub logs for details.
@@ -92,8 +92,8 @@ jobs:
           password: ${{ secrets.GMAIL_PASSWORD }}
           secure: true
           subject: "Flyway Migration: No Changes"
-          to: nairvineet1991@gmail.com
-          from: GitHub Actions Runner
+          to: "nairvineet1991@gmail.com" # Recipients
+          from: "GitHub DevOps Automation <${{ secrets.GMAIL_USER }}>"
           body: |
             The pipeline ran, but all scripts were already executed. 
             Database is up-to-date. No new modifications were applied.
@@ -108,8 +108,8 @@ jobs:
           password: ${{ secrets.GMAIL_PASSWORD }}
           secure: true
           subject: "Flyway Migration FAILED"
-          to: nairvineet1991@gmail.com
-          from: GitHub Actions Runner
+          to: "nairvineet1991@gmail.com" # Recipients
+          from: "GitHub DevOps Automation <${{ secrets.GMAIL_USER }}>"
           body: |
             CRITICAL: The migration script encountered an error and failed execution. 
             The SQL transaction has been rolled back and the tracking table was automatically repaired.
