@@ -55,36 +55,3 @@ jobs:
           body: |
             New database migrations were applied successfully to the data center! 
             Please check the GitHub logs for details.
-
-      - name: Send Email - Already Executed
-        if: success()
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port: 587
-          username: ${{ secrets.GMAIL_USER }}
-          password: ${{ secrets.GMAIL_PASSWORD }}
-          secure: true
-          subject: "Flyway Migration: No Changes"
-          to: nairvineet1991@gmail.com
-          from: GitHub Actions Runner
-          body: |
-            The pipeline ran, but all scripts were already executed. 
-            Database is up-to-date. No new modifications were applied.
-
-      - name: Send Email - Failed
-        if: always() # Runs even if previous steps failed
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port: 587
-          username: ${{ secrets.GMAIL_USER }}
-          password: ${{ secrets.GMAIL_PASSWORD }}
-          secure: true
-          subject: "Flyway Migration FAILED"
-          to: nairvineet1991@gmail.com
-          from: GitHub Actions Runner
-          body: |
-            CRITICAL: The migration script encountered an error and failed execution. 
-            The SQL transaction has been rolled back and the tracking table was automatically repaired.
-            Please review your V5__ or latest migration file formatting.
