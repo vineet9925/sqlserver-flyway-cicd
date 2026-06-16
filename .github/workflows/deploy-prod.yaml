@@ -78,9 +78,17 @@ jobs:
           subject: "Flyway Migration SUCCESS"
           to: "nairvineet1991@gmail.com" # Recipients
           from: "GitHub DevOps Automation <${{ secrets.GMAIL_USER }}>"
-          body: |
+          html_body: |
             New database migrations were applied successfully to the data center! 
-            Please check the GitHub logs for details.
+            Please check the GitHub logs for details.html_body: |
+            <h2>Database Deployment Successful</h2>
+            <p>The automated midnight pipeline has successfully deployed all pending SQL Server DDL scripts.</p>
+            <ul>
+             <li><b>Repository:</b> ${{ github.repository }}</li>
+             <li><b>Status:</b> All Flyway migrations are applied successfully via Gmail integration</li>
+             <li><b>Execution Time:</b> 12:00 AM EST</li>
+             </ul>
+             <p>You can view the detailed execution logs <a href="https://github.com/${{ github.repository }}/actions">here</a>.</p>
 
       - name: Send Email - Already Executed
         if: success() && env.STATUS == 'ALREADY_EXECUTED'
@@ -94,9 +102,15 @@ jobs:
           subject: "Flyway Migration: No Changes"
           to: "nairvineet1991@gmail.com" # Recipients
           from: "GitHub DevOps Automation <${{ secrets.GMAIL_USER }}>"
-          body: |
-            The pipeline ran, but all scripts were already executed. 
-            Database is up-to-date. No new modifications were applied.
+          html_body: |
+            <h2>Database Deployment Successful</h2>
+            <p>The automated midnight pipeline has successfully deployed all pending SQL Server DDL scripts.</p>
+            <ul>
+             <li><b>Repository:</b> ${{ github.repository }}</li>
+             <li><b>Status:</b> All Flyway migrations are already applied</li>
+             <li><b>Execution Time:</b> 12:00 AM EST</li>
+             </ul>
+             <p>You can view the detailed execution logs <a href="https://github.com/${{ github.repository }}/actions">here</a>.</p>
 
       - name: Send Email - Failed
         if: always() && env.STATUS == 'FAILED' # Runs even if previous steps failed
@@ -110,8 +124,13 @@ jobs:
           subject: "Flyway Migration FAILED"
           to: "nairvineet1991@gmail.com" # Recipients
           from: "GitHub DevOps Automation <${{ secrets.GMAIL_USER }}>"
-          body: |
-            CRITICAL: The migration script encountered an error and failed execution. 
-            The SQL transaction has been rolled back and the tracking table was automatically repaired.
-            Please review your V5__ or latest migration file formatting.
+          html_body: |
+            <h2>Database Deployment Successful</h2>
+            <p>The automated midnight pipeline has failed.</p>
+            <ul>
+             <li><b>Repository:</b> ${{ github.repository }}</li>
+             <li><b>Status:</b> All Flyway migrations applied successfully via Gmail integration</li>
+             <li><b>Execution Time:</b> 12:00 AM EST</li>
+             </ul>
+             <p>You can view the detailed execution logs <a href="https://github.com/${{ github.repository }}/actions">here</a>.</p>
         
