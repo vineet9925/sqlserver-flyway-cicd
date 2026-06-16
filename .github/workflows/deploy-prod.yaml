@@ -33,35 +33,8 @@ jobs:
       # You completely delete the old "-configFiles...", "-url..." text.
       # =========================================================================
       - name: Execute flyway Migrate
-	    id: flyway run
-        run: |
-		  flyway migrate -validateOnMigrate=false > flyway_output.log 2>&1 || exit_code=$?
-          
-          # Print the logs to the screen so you can read them in the GitHub Actions dashboard
-           cat flyway_output.log
-          
-          # --- DYNAMIC STATUS PARSING ---
-          if [ -n "$exit_code" ] && [ "$exit_code" -ne 0 ]; then
-            echo "STATUS=FAILED" >> $GITHUB_ENV
-            echo "status=failed" >> $GITHUB_OUTPUT
-            exit $exit_code # Force the step to fail so GitHub knows it crashed
-          elif grep -q "No migration necessary" flyway_output.log; then
-            echo "STATUS=ALREADY_EXECUTED" >> $GITHUB_ENV
-            echo "status=already_executed" >> $GITHUB_OUTPUT
-          else
-            echo "STATUS=SUCCESS" >> $GITHUB_ENV
-            echo "status=success" >> $GITHUB_OUTPUT
-          fi
-
-      # =========================================================================
-      # Auto-Clean Safety Step: Cleans tracking table only if Flyway crashed
-      # =========================================================================
-      - name: Auto-Clean History Table if Migration Fails
-         if: failure() && steps.flyway_run.outputs.status == 'failed'
-         run: |
-           echo "Migration failed. Automatically running Flyway Repair to clear the broken history row..."
-           flyway repair --configFiles=${{ env.FLYWAY_CONFIG_FILES }}
-		  
+        run: flyway migrate
+		
 		  
 	     # ==========================================
          #  DYNAMIC EMAIL NOTIFICATIONS
