@@ -33,6 +33,7 @@ jobs:
       # You completely delete the old "-configFiles...", "-url..." text.
       # =========================================================================
       - name: Execute flyway Migrate
+	    id: flyway run
         run: |
 		  flyway migrate -validateOnMigrate=false > flyway_output.log 2>&1 || exit_code=$?
           
