@@ -77,7 +77,7 @@ jobs:
            subject: "🚀 SUCCESS: Production Database DDL Pipeline Completed"
            to: "nairvineet1991@gmail.com" # Recipients
            from: "GitHub DevOps Automation <${{ secrets.GMAIL_USER }}>"
-           secure: true
+           tls: true
            priority: normal
            html_body: |
             <h2>Database Deployment Successful</h2>
