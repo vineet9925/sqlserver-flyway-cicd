@@ -1,7 +1,7 @@
 name: Production Flyway Database Deployment
 
 on:
-  workflow_dispatch:
+ workflow_dispatch:
 
 jobs:
   deploy-database:
