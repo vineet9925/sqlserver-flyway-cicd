@@ -88,10 +88,45 @@ jobs:
              <li><b>Execution Time:</b> 12:00 AM EST</li>
              </ul>
              <p>You can view the detailed execution logs <a href="https://github.com/${{ github.repository }}/actions">here</a>.</p>
-             
-             
-      
              <li><b>Execution Time:</b> 12:00 AM EST</li>
              </ul>
-             <p>You can view the detailed execution logs <a href="https://github.com/${{ github.repository }}/actions">here</a>.</p>
+
+      - name: Send Email - Failed
+        if: always() && env.STATUS == 'FAILED' # Runs even if previous steps failed
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.GMAIL_USER }}
+          password: ${{ secrets.GMAIL_PASSWORD }}
+          secure: true
+          subject: "Flyway Migration FAILED"
+          to: "nairvineet1991@gmail.com" # Recipients
+          from: "GitHub DevOps Automation <${{ secrets.GMAIL_USER }}>"
+          html_body: |
+            <h2>Database Deployment Successful</h2>
+            <p>The automated midnight pipeline has failed.</p>
+            <ul>
+             <li><b>Repository:</b> ${{ github.repository }}</li>
+             <li><b>Status:</b>Flyway migrations failed</li>
+
+      - name: Send Email - Failed
+        if: success() && env.STATUS == 'ALREADY_EXECUTED' # Runs even if previous steps failed
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.GMAIL_USER }}
+          password: ${{ secrets.GMAIL_PASSWORD }}
+          secure: true
+          subject: "Flyway Migration FAILED"
+          to: "nairvineet1991@gmail.com" # Recipients
+          from: "GitHub DevOps Automation <${{ secrets.GMAIL_USER }}>"
+          html_body: |
+            <h2>Database Deployment Successful</h2>
+            <p>The automated midnight pipeline has failed.</p>
+            <ul>
+             <li><b>Repository:</b> ${{ github.repository }}</li>
+             <li><b>Status:</b> Flyway migrations was already applied</li>
+             
         
